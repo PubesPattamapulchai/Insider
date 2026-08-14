@@ -13,6 +13,7 @@ let players = {};
 let myPrivate = {};
 let publicState = {};
 let roleVisible = false;
+let frozenWords = [];
 
 const path = (suffix = '') => `rooms/${roomCode}${suffix ? '/' + suffix : ''}`;
 const entries = () => Object.entries(players).sort((a, b) => (a[1].joinedAt || 0) - (b[1].joinedAt || 0));
@@ -88,7 +89,10 @@ function renderAll() {
   const created = Boolean(roomCode);
   $('roomPanel').classList.toggle('hidden', !created);
   $('playersPanel').classList.toggle('hidden', !created);
-  $('settingsPanel').classList.toggle('hidden', !created);
+  // ชุดคำแก้ได้เฉพาะก่อนสร้างห้องเท่านั้น หลังสร้างแล้ว Host จะไม่เห็นรายการคำอีก
+  $('settingsPanel').classList.toggle('hidden', created);
+  $('hostNameInput').disabled = created;
+  $('createRoomBtn').classList.toggle('hidden', created);
   if (created) $('roomCode').textContent = roomCode;
   renderPlayers();
   renderMyRole();
@@ -118,6 +122,9 @@ async function createRoom() {
   if (!name) return alert('กรุณาใส่ชื่อของคุณ');
   if (!db || !hostUid) return alert('Firebase ยังไม่พร้อม');
 
+  const preparedWords = wordsFromEditor();
+  if (!preparedWords.length) return alert('กรุณาใส่คำลับอย่างน้อย 1 คำก่อนสร้างห้อง');
+
   let code = '';
   for (let i = 0; i < 10; i++) {
     const candidate = randomRoomCode();
@@ -129,6 +136,8 @@ async function createRoom() {
   if (!code) return alert('สร้าง Room Code ไม่สำเร็จ');
 
   roomCode = code;
+  // Freeze ชุดคำ ณ ตอนสร้างห้อง ใช้สุ่มต่อได้ แต่ไม่แสดงบน UI หลังจากนี้
+  frozenWords = [...preparedWords];
   localStorage.setItem('insider_host_name', name);
   localStorage.setItem('insider_host_room', roomCode);
 
@@ -142,6 +151,13 @@ async function createRoom() {
     assigned: false
   });
   try { await onDisconnect(ref(db, path(`players/${hostUid}/connected`))).set(false); } catch {}
+
+  // ไม่เก็บชุดคำที่แก้ไขไว้ใน localStorage หลังสร้างห้อง และล้างจาก textarea ก่อนซ่อน
+  // เพื่อไม่ให้ Host เปิด UI กลับมาเห็นชุดที่ใช้ในห้องปัจจุบันโดยบังเอิญ
+  localStorage.removeItem('insider_word_deck');
+  $('wordDeck').value = '';
+  $('wordCount').textContent = '';
+
   attachRoom();
   renderAll();
 }
@@ -149,12 +165,11 @@ async function createRoom() {
 async function assignRound() {
   const list = entries();
   if (list.length < 3 || list.length > 6) return alert('ต้องมีผู้เล่น 3-6 คน');
-  const words = wordsFromEditor();
-  if (!words.length) return alert('กรุณาใส่คำลับอย่างน้อย 1 คำ');
+  if (!frozenWords.length) return alert('ไม่พบชุดคำของห้องนี้ กรุณาสร้างห้องใหม่');
 
   const roles = makeRolePool(list.length);
   const shuffledPlayers = shuffle(list);
-  const secretWord = pickSecret(words);
+  const secretWord = pickSecret(frozenWords);
   const roundNumber = Number(publicState?.roundNumber || 0) + 1;
   const roundId = `round_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
   const updates = {};
@@ -204,11 +219,17 @@ $('hostRoleRevealBtn').addEventListener('click', () => {
   renderMyRole();
 });
 $('wordDeck').addEventListener('input', updateWordCount);
+$('resetWordDeckBtn').addEventListener('click', () => {
+  if (roomCode) return;
+  $('wordDeck').value = DEFAULT_WORDS.join('\n');
+  updateWordCount();
+});
 
 (async () => {
   $('hostNameInput').value = localStorage.getItem('insider_host_name') || '';
   $('wordDeck').value = localStorage.getItem('insider_word_deck') || DEFAULT_WORDS.join('\n');
   updateWordCount();
+  renderAll();
 
   try {
     if (!isFirebaseConfigured()) throw new Error('Firebase config ไม่ครบ');

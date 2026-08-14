@@ -40,9 +40,7 @@ Implementation แรกให้ Host subscribe `private` ทั้งห้อ
 
 - Host subscribe เฉพาะ `private/<hostUid>`
 - Player subscribe เฉพาะ `private/<uid>`
-- ห้อง Insider-lite ตั้ง `public/gameType = insider-lite`
-- Firebase Rules ปิด parent-level Host read สำหรับ `private` เมื่อเป็นห้อง Insider-lite แต่ยังให้เจ้าของ uid อ่านของตัวเอง
+- Firebase Rules อนุญาต `.read` private เฉพาะเจ้าของ uid
 - Host ยัง `.write` private ของทุกคนเพื่อแจก Role/คำลับได้
-- path `actions` / `votes` เดิมยังอยู่ใน Rules เพื่อ backward compatibility กับ Werewolf หากแชร์ Firebase project เดียวกัน
 
 ผลคือใครก็สามารถสุ่มได้ MASTER โดยไม่ต้องโยนปุ่ม/คำสั่งกลับมาที่ Host
