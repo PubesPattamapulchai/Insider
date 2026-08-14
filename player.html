@@ -3,54 +3,86 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#090b10">
-  <title>Insider Player</title>
+  <meta name="theme-color" content="#090a0f">
+  <meta name="color-scheme" content="dark">
+  <title>Insider — Player</title>
   <link rel="stylesheet" href="./theme.css">
 </head>
 <body>
 <main class="app player-app">
-  <header class="topbar">
-    <div class="brand"><div class="brand-mark">🗝️</div><div><h1>Insider</h1><p>การ์ด Role ส่วนตัว</p></div></div>
-    <span id="connectionStatus" class="status">กำลังเชื่อม…</span>
+  <header class="topbar player-topbar">
+    <a class="brand" href="./player.html" aria-label="Insider Player">
+      <div class="brand-mark" aria-hidden="true"><span>◆</span></div>
+      <div>
+        <div class="brand-row"><h1>Insider</h1><span class="brand-tag">PLAYER</span></div>
+        <p>การ์ดลับส่วนตัวของคุณ</p>
+      </div>
+    </a>
+    <span id="connectionStatus" class="status status-connection" aria-live="polite">
+      <span class="status-dot"></span><span>กำลังเชื่อม…</span>
+    </span>
   </header>
 
   <div class="player-shell">
     <section id="joinView" class="card join-card">
-      <div class="eyebrow">JOIN ROOM</div>
+      <div class="join-orb" aria-hidden="true">◆</div>
+      <div class="eyebrow">JOIN INSIDER ROOM</div>
       <h2>เข้าห้องเกม</h2>
-      <p>ใส่ Room Code จาก Host และชื่อที่ใช้เล่น</p>
-      <div class="stack" style="margin-top:18px">
-        <input id="roomInput" class="field room" maxlength="6" placeholder="IABCDE" autocomplete="off">
-        <input id="nameInput" class="field" maxlength="24" placeholder="ชื่อผู้เล่น" autocomplete="nickname">
-        <button id="joinBtn" class="btn primary big">เข้าห้อง</button>
+      <p>รับ Room Code จาก Host แล้วใส่ชื่อที่ทุกคนจำได้ง่าย</p>
+      <div class="join-form">
+        <label class="field-label" for="roomInput">Room Code</label>
+        <input id="roomInput" class="field room" maxlength="6" placeholder="IABCDE" autocomplete="off" autocapitalize="characters">
+        <label class="field-label" for="nameInput">ชื่อของคุณ</label>
+        <input id="nameInput" class="field" maxlength="24" placeholder="เช่น Mint" autocomplete="nickname">
+        <button id="joinBtn" class="btn primary big" type="button" disabled>เข้าห้อง <span aria-hidden="true">→</span></button>
       </div>
+      <div class="join-footnote"><span>◈</span> Role และคำลับของคุณจะถูกอ่านได้จากเครื่องนี้เท่านั้น</div>
     </section>
 
     <section id="gameView" class="hidden stack">
-      <div class="row between wrap">
-        <span class="status">ROOM <b id="roomText">—</b></span>
-        <span id="meText" class="status">—</span>
+      <div class="session-bar">
+        <div><small>ROOM</small><strong id="roomText">—</strong></div>
+        <div class="session-name"><small>YOU</small><strong id="meText">—</strong></div>
       </div>
 
-      <section id="waitingCard" class="card hero-card">
-        <div class="eyebrow">WAITING</div>
-        <h2 id="waitingTitle">รอ Host สุ่ม Role</h2>
-        <p id="waitingCopy">เมื่อสุ่มแล้ว การ์ดลับของคุณจะปรากฏตรงนี้</p>
+      <section id="waitingCard" class="card hero-card waiting-card">
+        <div class="waiting-lock" aria-hidden="true">
+          <span class="waiting-ring"></span><span class="waiting-key">◆</span>
+        </div>
+        <div class="eyebrow">WAITING FOR HOST</div>
+        <h2 id="waitingTitle">เข้าห้องแล้ว</h2>
+        <p id="waitingCopy">รอ Host สุ่ม Role เมื่อพร้อม การ์ดลับจะปรากฏบนหน้าจอนี้โดยอัตโนมัติ</p>
+        <div class="waiting-pulse"><span></span> กำลังรอรอบถัดไป</div>
       </section>
 
-      <section id="roleArea" class="card panel hidden">
-        <div class="panel-head"><div><div class="panel-title">การ์ดลับของคุณ</div><div class="panel-desc">อย่าให้คนอื่นเห็นหน้าจอ</div></div></div>
-        <button id="roleRevealBtn" class="btn primary big" style="width:100%">🔒 แตะเพื่อดู Role</button>
-        <div id="roleCard" class="hidden" style="margin-top:12px"></div>
+      <section id="roleArea" class="card panel secret-panel hidden">
+        <div class="panel-head">
+          <div>
+            <div class="panel-title">การ์ดลับของคุณ</div>
+            <div class="panel-desc">มองรอบตัวก่อนเปิด แล้วซ่อนทันทีเมื่ออ่านเสร็จ</div>
+          </div>
+          <span class="private-badge">PRIVATE</span>
+        </div>
+        <button id="roleRevealBtn" class="role-cover player-role-cover" type="button">
+          <span class="cover-symbol" aria-hidden="true">⌾</span>
+          <strong>แตะเพื่อเปิดการ์ด</strong>
+          <small>อย่าให้ผู้เล่นคนอื่นเห็นหน้าจอ</small>
+        </button>
+        <div id="roleCard" class="hidden role-card-wrap"></div>
       </section>
 
-      <section class="card panel">
-        <div class="panel-head"><div><div class="panel-title">ผู้เล่นในห้อง</div><div class="panel-desc">รายชื่อนี้ไม่เปิดเผย Role</div></div></div>
-        <div id="playerList" class="players"></div>
-      </section>
+      <details class="card panel players-details">
+        <summary class="players-summary">
+          <span><b>ผู้เล่นในห้อง</b><small>Role ของทุกคนยังเป็นความลับ</small></span>
+          <span id="playerCount" class="count-pill">0 คน</span>
+        </summary>
+        <div id="playerList" class="players players-inside"></div>
+      </details>
     </section>
   </div>
 </main>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
 <script type="module" src="./player.js"></script>
 </body>
 </html>

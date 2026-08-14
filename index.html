@@ -3,87 +3,158 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#090b10">
-  <title>Insider Host</title>
+  <meta name="theme-color" content="#090a0f">
+  <meta name="color-scheme" content="dark">
+  <title>Insider — Host</title>
   <link rel="stylesheet" href="./theme.css">
 </head>
 <body>
-<main class="app">
+<main class="app host-app">
   <header class="topbar">
-    <div class="brand">
-      <div class="brand-mark">🗝️</div>
-      <div><h1>Insider</h1><p>ระบบสุ่ม Role + คำลับ เท่านั้น ที่เหลือคุยกันบนโต๊ะ</p></div>
-    </div>
-    <span id="connectionStatus" class="status">กำลังเชื่อม Firebase…</span>
+    <a class="brand" href="./" aria-label="Insider Home">
+      <div class="brand-mark" aria-hidden="true"><span>◆</span></div>
+      <div>
+        <div class="brand-row"><h1>Insider</h1><span class="brand-tag">HOST</span></div>
+        <p>แจก Role และคำลับ แล้วเล่นกันบนโต๊ะจริง</p>
+      </div>
+    </a>
+    <span id="connectionStatus" class="status status-connection" aria-live="polite">
+      <span class="status-dot"></span><span>กำลังเชื่อม…</span>
+    </span>
   </header>
 
-  <div class="grid">
-    <aside class="stack">
-      <section class="card panel">
-        <div class="panel-head">
-          <div><div class="panel-title">สร้างห้อง</div><div class="panel-desc">Host เป็นผู้เล่นด้วย และมีสิทธิ์ถูกสุ่มเป็น MASTER / INSIDER / CITIZEN เหมือนทุกคน</div></div>
+  <div class="grid host-grid">
+    <aside class="stack host-sidebar">
+      <section class="card panel setup-card">
+        <div class="section-kicker"><span class="step-badge">1</span> เตรียมห้อง</div>
+        <div class="panel-head compact">
+          <div>
+            <div class="panel-title">ชื่อของคุณ</div>
+            <div class="panel-desc">Host เป็นผู้เล่นเหมือนทุกคนและถูกสุ่ม Role ได้ทุกบทบาท</div>
+          </div>
         </div>
-        <div class="stack">
-          <input id="hostNameInput" class="field" maxlength="24" placeholder="ชื่อของคุณ" autocomplete="nickname">
-          <button id="createRoomBtn" class="btn primary big">สร้างห้อง Insider</button>
+        <div id="preRoomControls">
+          <label class="field-label" for="hostNameInput">ชื่อที่ใช้เล่น</label>
+          <input id="hostNameInput" class="field" maxlength="24" placeholder="เช่น Pubes" autocomplete="nickname">
         </div>
-        <div id="roomPanel" class="hidden" style="margin-top:14px">
+
+        <div id="settingsPanel" class="word-deck-block">
+          <div class="divider"></div>
+          <div class="word-summary-row">
+            <div>
+              <div class="panel-title small">คลังคำลับ</div>
+              <div class="panel-desc">ตรวจหรือเพิ่มคำได้ก่อนสร้างห้องเท่านั้น</div>
+            </div>
+            <span id="wordCount" class="count-pill">— คำ</span>
+          </div>
+          <details id="wordDeckDetails" class="word-details">
+            <summary>
+              <span>แก้ไขชุดคำ</span>
+              <span class="summary-hint">ดู / เพิ่ม / ลบ</span>
+            </summary>
+            <div class="word-editor-shell">
+              <textarea id="wordDeck" class="field word-editor" spellcheck="false" aria-label="ชุดคำลับ หนึ่งคำต่อบรรทัด"></textarea>
+              <div class="word-toolbar">
+                <span class="panel-desc">1 คำต่อบรรทัด • คำซ้ำจะถูกตัดออกตอนสุ่ม</span>
+                <button id="resetWordDeckBtn" class="btn text-btn" type="button">คืนค่าคำเริ่มต้น</button>
+              </div>
+            </div>
+          </details>
+          <div class="privacy-note">
+            <span class="privacy-icon">◈</span>
+            <span><b>หลังสร้างห้อง</b> รายการคำจะถูกซ่อนและล้างออกจากหน้าจอ Host ทันที</span>
+          </div>
+        </div>
+
+        <div id="createRoomControl">
+          <button id="createRoomBtn" class="btn primary big create-room-cta" type="button" disabled>
+            <span>สร้างห้อง Insider</span><span aria-hidden="true">→</span>
+          </button>
+        </div>
+
+        <div id="roomPanel" class="hidden session-panel">
+          <div class="divider"></div>
+          <div class="section-kicker"><span class="step-badge done">✓</span> ห้องพร้อมแล้ว</div>
           <div class="room-box">
-            <div><div class="room-label">ROOM CODE</div><div id="roomCode" class="room-code">—</div></div>
-            <button id="copyLinkBtn" class="btn secondary">คัดลอกลิงก์</button>
+            <div class="room-code-block">
+              <div class="room-label">ROOM CODE</div>
+              <div id="roomCode" class="room-code">—</div>
+              <div class="room-helper">ให้ผู้เล่นกรอกรหัสนี้ หรือแชร์ลิงก์ด้านล่าง</div>
+            </div>
+            <div class="room-actions">
+              <button id="shareLinkBtn" class="btn primary compact-btn" type="button">แชร์</button>
+              <button id="copyLinkBtn" class="btn secondary compact-btn" type="button">คัดลอกลิงก์</button>
+            </div>
           </div>
         </div>
       </section>
 
       <section id="playersPanel" class="card panel hidden">
+        <div class="section-kicker"><span class="step-badge">2</span> รวมผู้เล่น</div>
         <div class="panel-head">
-          <div><div class="panel-title">ผู้เล่น</div><div class="panel-desc">ครบแล้วกดสุ่มได้เลย</div></div>
-          <span id="playerCount" class="status">0 / 6</span>
+          <div>
+            <div class="panel-title">ผู้เล่นในห้อง</div>
+            <div id="playerHint" class="panel-desc">ต้องมี 3–6 คนจึงจะสุ่มได้</div>
+          </div>
+          <span id="playerCount" class="count-pill">0 / 6</span>
         </div>
         <div id="playerList" class="players"></div>
-        <div class="divider"></div>
-        <button id="assignBtn" class="btn primary big" style="width:100%">🎲 สุ่ม Role + คำลับ</button>
-      </section>
-
-      <section id="settingsPanel" class="card panel hidden">
-        <div class="panel-head">
-          <div><div class="panel-title">ชุดคำลับ</div><div class="panel-desc">1 คำต่อบรรทัด ระบบจะสุ่ม 1 คำต่อรอบ</div></div>
-        </div>
-        <textarea id="wordDeck" class="field word-editor" spellcheck="false"></textarea>
-        <div id="wordCount" class="panel-desc" style="margin-top:8px"></div>
+        <button id="assignBtn" class="btn primary big assign-cta" type="button" disabled>
+          🎲 สุ่ม Role + คำลับ
+        </button>
       </section>
     </aside>
 
-    <section class="stack">
-      <section class="card hero-card">
-        <div class="eyebrow">DIGITAL ROLE CARDS</div>
-        <h2 id="heroTitle">สร้างห้องเพื่อเริ่มเกม</h2>
-        <p id="heroCopy">ระบบนี้ไม่คุม Phase ไม่จับเวลา และไม่มีปุ่มตอบคำถาม ทุกคนคุยและโหวตกันเองตามเกมจริง</p>
+    <section class="stack host-main">
+      <section class="card hero-card game-hero">
+        <div class="hero-glow" aria-hidden="true"></div>
+        <div class="eyebrow">INSIDER • DIGITAL ROLE CARDS</div>
+        <h2 id="heroTitle">พร้อมสร้างห้อง</h2>
+        <p id="heroCopy">เว็บจะจัดการเฉพาะสิ่งที่ต้องเป็นความลับ: Role และคำลับ ส่วนการถาม ตอบ จับเวลา และโหวต เล่นกันด้วยเสียงตามปกติ</p>
+        <div class="hero-rule-chips" aria-label="กติกาหลัก">
+          <span><i class="role-dot master-dot"></i>MASTER รู้คำ</span>
+          <span><i class="role-dot insider-dot"></i>INSIDER รู้คำ</span>
+          <span><i class="role-dot citizen-dot"></i>CITIZEN ไม่รู้คำ</span>
+        </div>
         <div id="roundInfo" class="info-strip hidden"></div>
       </section>
 
-      <section id="hostRoleArea" class="card panel hidden">
+      <section id="hostRoleArea" class="card panel secret-panel hidden">
+        <div class="section-kicker"><span class="step-badge">3</span> การ์ดของคุณ</div>
         <div class="panel-head">
-          <div><div class="panel-title">การ์ดลับของคุณ</div><div class="panel-desc">เปิดดูคนเดียว แล้วซ่อนก่อนส่งเครื่องให้คนอื่นเห็น</div></div>
+          <div>
+            <div class="panel-title">Role ส่วนตัว</div>
+            <div class="panel-desc">เช็กว่าไม่มีใครมองหน้าจอก่อนเปิด</div>
+          </div>
+          <span class="private-badge">PRIVATE</span>
         </div>
-        <button id="hostRoleRevealBtn" class="btn ghost big" style="width:100%">🔒 แตะเพื่อดู Role</button>
-        <div id="hostRoleCard" class="hidden" style="margin-top:12px"></div>
+        <button id="hostRoleRevealBtn" class="role-cover" type="button">
+          <span class="cover-symbol" aria-hidden="true">⌾</span>
+          <strong>แตะเพื่อเปิดการ์ด</strong>
+          <small>Role และคำลับจะอยู่ใต้การ์ดนี้</small>
+        </button>
+        <div id="hostRoleCard" class="hidden role-card-wrap"></div>
       </section>
 
-      <section class="card panel">
-        <div class="panel-head"><div><div class="panel-title">วิธีเล่นกับเว็บนี้</div><div class="panel-desc">เว็บทำแค่ส่วนที่ต้องเป็นความลับ</div></div></div>
-        <div class="steps">
-          <div><b>1.</b> ทุกคนเข้าห้องด้วยมือถือของตัวเอง</div>
-          <div><b>2.</b> Host กด “สุ่ม Role + คำลับ”</div>
-          <div><b>3.</b> แต่ละคนเปิดดู Role ของตัวเอง</div>
-          <div><b>4.</b> เฉพาะ <b>MASTER</b> และ <b>INSIDER</b> จะเห็นคำลับเดียวกัน</div>
-          <div><b>5.</b> หลังจากนั้นถาม–ตอบ อภิปราย และโหวตกันด้วยเสียงตามปกติ ไม่ต้องกดอะไรในเว็บ</div>
-          <div><b>6.</b> อยากเล่นรอบใหม่ ให้ Host กดสุ่มอีกครั้ง</div>
+      <section class="card panel guide-panel">
+        <div class="panel-head">
+          <div>
+            <div class="panel-title">เล่นยังไงกับเว็บนี้</div>
+            <div class="panel-desc">ระบบตั้งใจให้สั้นที่สุด เพื่อไม่ขัดจังหวะเกมบนโต๊ะ</div>
+          </div>
+        </div>
+        <div class="flow-grid">
+          <div class="flow-step"><span>01</span><div><b>เข้าห้อง</b><p>ทุกคนใช้มือถือของตัวเองเข้าด้วย Room Code</p></div></div>
+          <div class="flow-step"><span>02</span><div><b>สุ่ม</b><p>Host กดสุ่ม Role + คำลับหนึ่งครั้งต่อรอบ</p></div></div>
+          <div class="flow-step"><span>03</span><div><b>แอบดู</b><p>MASTER และ INSIDER เห็นคำเดียวกัน ส่วน CITIZEN ไม่เห็น</p></div></div>
+          <div class="flow-step"><span>04</span><div><b>วางมือถือ</b><p>จากนั้นถาม–ตอบ อภิปราย และโหวตกันเองตามปกติ</p></div></div>
         </div>
       </section>
     </section>
   </div>
 </main>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
 <script type="module" src="./host.js"></script>
 </body>
 </html>
