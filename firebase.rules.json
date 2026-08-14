@@ -15,38 +15,44 @@
         "players": {
           ".read": "auth != null && root.child('rooms').child($room).child('hostUid').exists()",
           "$uid": {
-            "name": {
-              ".write": "auth != null && (auth.uid == $uid || root.child('rooms').child($room).child('hostUid').val() == auth.uid)"
-            },
-            "connected": {
-              ".write": "auth != null && (auth.uid == $uid || root.child('rooms').child($room).child('hostUid').val() == auth.uid)"
-            },
-            "joinedAt": {
-              ".write": "auth != null && (root.child('rooms').child($room).child('hostUid').val() == auth.uid || (auth.uid == $uid && !data.exists()))"
-            },
-            "alive": {
-              ".write": "auth != null && root.child('rooms').child($room).child('hostUid').val() == auth.uid"
-            },
-            "assigned": {
-              ".write": "auth != null && root.child('rooms').child($room).child('hostUid').val() == auth.uid"
-            },
-            "eliminatedBy": {
-              ".write": "auth != null && root.child('rooms').child($room).child('hostUid').val() == auth.uid"
-            },
-            "eliminatedAt": {
-              ".write": "auth != null && root.child('rooms').child($room).child('hostUid').val() == auth.uid"
-            },
-            "isHost": {
-              ".write": "auth != null && root.child('rooms').child($room).child('hostUid').val() == auth.uid"
-            }
+            "name": { ".write": "auth != null && (auth.uid == $uid || root.child('rooms').child($room).child('hostUid').val() == auth.uid)" },
+            "connected": { ".write": "auth != null && (auth.uid == $uid || root.child('rooms').child($room).child('hostUid').val() == auth.uid)" },
+            "joinedAt": { ".write": "auth != null && (root.child('rooms').child($room).child('hostUid').val() == auth.uid || (auth.uid == $uid && !data.exists()))" },
+            "alive": { ".write": "auth != null && root.child('rooms').child($room).child('hostUid').val() == auth.uid" },
+            "assigned": { ".write": "auth != null && root.child('rooms').child($room).child('hostUid').val() == auth.uid" },
+            "eliminatedBy": { ".write": "auth != null && root.child('rooms').child($room).child('hostUid').val() == auth.uid" },
+            "eliminatedAt": { ".write": "auth != null && root.child('rooms').child($room).child('hostUid').val() == auth.uid" },
+            "isHost": { ".write": "auth != null && root.child('rooms').child($room).child('hostUid').val() == auth.uid" }
           }
         },
         "private": {
-          ".read": "auth != null && root.child('rooms').child($room).child('hostUid').val() == auth.uid && !(root.child('rooms').child($room).child('public').child('gameType').val() == 'insider-lite')",
+          ".read": "auth != null && root.child('rooms').child($room).child('hostUid').val() == auth.uid && root.child('rooms').child($room).child('public').child('gameType').val() != 'insider-lite' && root.child('rooms').child($room).child('public').child('gameType').val() != 'spyfall'",
           "$uid": {
-            ".read": "auth != null && (auth.uid == $uid || (root.child('rooms').child($room).child('hostUid').val() == auth.uid && !(root.child('rooms').child($room).child('public').child('gameType').val() == 'insider-lite')))",
-            ".write": "auth != null && root.child('rooms').child($room).child('hostUid').val() == auth.uid"
+            ".read": "auth != null && (auth.uid == $uid || (root.child('rooms').child($room).child('hostUid').val() == auth.uid && root.child('rooms').child($room).child('public').child('gameType').val() != 'insider-lite' && root.child('rooms').child($room).child('public').child('gameType').val() != 'spyfall'))",
+            ".write": "auth != null && root.child('rooms').child($room).child('hostUid').val() == auth.uid",
+            "voteLocks": {
+              "$accusationId": {
+                ".write": "auth != null && auth.uid == $uid && !data.exists() && newData.val() == true && root.child('rooms').child($room).child('public').child('gameType').val() == 'spyfall' && root.child('rooms').child($room).child('public').child('state').val() == 'accusation' && root.child('rooms').child($room).child('public').child('accusationId').val() == $accusationId"
+              }
+            }
           }
+        },
+        "hostSecret": {
+          ".read": "auth != null && root.child('rooms').child($room).child('hostUid').val() == auth.uid",
+          ".write": "auth != null && root.child('rooms').child($room).child('hostUid').val() == auth.uid"
+        },
+        "spyVotes": {
+          "$accusationId": {
+            ".read": "auth != null && root.child('rooms').child($room).child('hostUid').val() == auth.uid",
+            "$uid": {
+              ".read": "auth != null && auth.uid == $uid",
+              ".write": "auth != null && auth.uid == $uid && !data.exists() && root.child('rooms').child($room).child('public').child('gameType').val() == 'spyfall' && root.child('rooms').child($room).child('public').child('state').val() == 'accusation' && root.child('rooms').child($room).child('public').child('accusationId').val() == $accusationId && root.child('rooms').child($room).child('public').child('suspectUid').val() != $uid && (newData.child('choice').val() == 'yes' || newData.child('choice').val() == 'no')"
+            }
+          }
+        },
+        "spyGuess": {
+          ".read": "auth != null && root.child('rooms').child($room).child('hostUid').val() == auth.uid",
+          ".write": "auth != null && !data.exists() && newData.child('uid').val() == auth.uid && root.child('rooms').child($room).child('public').child('gameType').val() == 'spyfall' && root.child('rooms').child($room).child('public').child('state').val() == 'playing' && root.child('rooms').child($room).child('private').child(auth.uid).child('isSpy').val() == true && newData.child('roundId').val() == root.child('rooms').child($room).child('public').child('roundId').val() && newData.child('location').isString()"
         },
         "actions": {
           "$namespace": {
