@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#090b10">
+  <title>Insider Host</title>
+  <link rel="stylesheet" href="./theme.css">
+</head>
+<body>
+<main class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">🗝️</div>
+      <div><h1>Insider</h1><p>ระบบสุ่ม Role + คำลับ เท่านั้น ที่เหลือคุยกันบนโต๊ะ</p></div>
+    </div>
+    <span id="connectionStatus" class="status">กำลังเชื่อม Firebase…</span>
+  </header>
+
+  <div class="grid">
+    <aside class="stack">
+      <section class="card panel">
+        <div class="panel-head">
+          <div><div class="panel-title">สร้างห้อง</div><div class="panel-desc">Host เป็นผู้เล่นด้วย และมีสิทธิ์ถูกสุ่มเป็น MASTER / INSIDER / CITIZEN เหมือนทุกคน</div></div>
+        </div>
+        <div class="stack">
+          <input id="hostNameInput" class="field" maxlength="24" placeholder="ชื่อของคุณ" autocomplete="nickname">
+          <button id="createRoomBtn" class="btn primary big">สร้างห้อง Insider</button>
+        </div>
+        <div id="roomPanel" class="hidden" style="margin-top:14px">
+          <div class="room-box">
+            <div><div class="room-label">ROOM CODE</div><div id="roomCode" class="room-code">—</div></div>
+            <button id="copyLinkBtn" class="btn secondary">คัดลอกลิงก์</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="playersPanel" class="card panel hidden">
+        <div class="panel-head">
+          <div><div class="panel-title">ผู้เล่น</div><div class="panel-desc">ครบแล้วกดสุ่มได้เลย</div></div>
+          <span id="playerCount" class="status">0 / 6</span>
+        </div>
+        <div id="playerList" class="players"></div>
+        <div class="divider"></div>
+        <button id="assignBtn" class="btn primary big" style="width:100%">🎲 สุ่ม Role + คำลับ</button>
+      </section>
+
+      <section id="settingsPanel" class="card panel hidden">
+        <div class="panel-head">
+          <div><div class="panel-title">ชุดคำลับ</div><div class="panel-desc">1 คำต่อบรรทัด ระบบจะสุ่ม 1 คำต่อรอบ</div></div>
+        </div>
+        <textarea id="wordDeck" class="field word-editor" spellcheck="false"></textarea>
+        <div id="wordCount" class="panel-desc" style="margin-top:8px"></div>
+      </section>
+    </aside>
+
+    <section class="stack">
+      <section class="card hero-card">
+        <div class="eyebrow">DIGITAL ROLE CARDS</div>
+        <h2 id="heroTitle">สร้างห้องเพื่อเริ่มเกม</h2>
+        <p id="heroCopy">ระบบนี้ไม่คุม Phase ไม่จับเวลา และไม่มีปุ่มตอบคำถาม ทุกคนคุยและโหวตกันเองตามเกมจริง</p>
+        <div id="roundInfo" class="info-strip hidden"></div>
+      </section>
+
+      <section id="hostRoleArea" class="card panel hidden">
+        <div class="panel-head">
+          <div><div class="panel-title">การ์ดลับของคุณ</div><div class="panel-desc">เปิดดูคนเดียว แล้วซ่อนก่อนส่งเครื่องให้คนอื่นเห็น</div></div>
+        </div>
+        <button id="hostRoleRevealBtn" class="btn ghost big" style="width:100%">🔒 แตะเพื่อดู Role</button>
+        <div id="hostRoleCard" class="hidden" style="margin-top:12px"></div>
+      </section>
+
+      <section class="card panel">
+        <div class="panel-head"><div><div class="panel-title">วิธีเล่นกับเว็บนี้</div><div class="panel-desc">เว็บทำแค่ส่วนที่ต้องเป็นความลับ</div></div></div>
+        <div class="steps">
+          <div><b>1.</b> ทุกคนเข้าห้องด้วยมือถือของตัวเอง</div>
+          <div><b>2.</b> Host กด “สุ่ม Role + คำลับ”</div>
+          <div><b>3.</b> แต่ละคนเปิดดู Role ของตัวเอง</div>
+          <div><b>4.</b> เฉพาะ <b>MASTER</b> และ <b>INSIDER</b> จะเห็นคำลับเดียวกัน</div>
+          <div><b>5.</b> หลังจากนั้นถาม–ตอบ อภิปราย และโหวตกันด้วยเสียงตามปกติ ไม่ต้องกดอะไรในเว็บ</div>
+          <div><b>6.</b> อยากเล่นรอบใหม่ ให้ Host กดสุ่มอีกครั้ง</div>
+        </div>
+      </section>
+    </section>
+  </div>
+</main>
+<script type="module" src="./host.js"></script>
+</body>
+</html>

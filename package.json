@@ -1,0 +1,8 @@
+{
+  "name": "insider-board-game",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check game-core.js && node --check host.js && node --check player.js"
+  }
+}
